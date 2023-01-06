@@ -2,18 +2,23 @@
 
 namespace MarkovLibraryCSharp
 {
-    public class TransitionGraph<_NameType, _VertexType> : BaseGraph<_NameType, _VertexType> where _VertexType : IVertex
+    public class TransitionGraph<_NameType, _VertexType> : BaseGraph<_NameType, _VertexType> where _VertexType : IVertex where _ArcType : IArc 
 	{
 		//one iteration of a Markov Chain
 		private void markovProbabilityIteration()
 		{
+			MarkovFunctors.MarkovFunctors.ProbInnerProduct<_VertexType, delegate> probInnerProductDel = MarkovFunctors.MarkovFunctors.ProbInnerProductMethod < _VertexType, delegate>;
+			MarkovFunctors.MarkovFunctors.ArcTimesProb<IArc<_VertexType>> arcTimesProbDel = MarkovFunctors.MarkovFunctors.ArcTimesProbMethod<IArc<_VertexType>>;
+			var tempProb = 0.0;
+			probInnerProductDel(_vertexSet, arcTimesProbDel<IArc<_VertexType>>(tempProb,_vertexSet));
+			_vertexSet.ForEach(probInnerProduct);
 			foreach(var vertex in _vertexSet)
             {
 				//TODO: fix this
-				//ProbInnerProduct<_VertexType,ArcTimesPay<_ArcType>>();
+				ProbInnerProduct<<List<_VertexType>,ArcTimesPay<IVertex.Arc<IVertex>>>(vertex);
             }
 			//TODO: fix this
-			//std::for_each(_vertexSet.begin(), _vertexSet.end(), MarkovFunctors.ProbInnerProduct<VertexSet_Type.value_type, MarkovFunctors.ArcTimesProb<Vertex.Arc<Vertex>>>());
+			std::for_each(_vertexSet.begin(), _vertexSet.end(), MarkovFunctors.ProbInnerProduct<List<_VertexType>, MarkovFunctors.ArcTimesProb<Vertex.Arc<Vertex>>>());
 		}
 		//add an arc
 		public void addArc(_NameType tail, _NameType head, double probability)

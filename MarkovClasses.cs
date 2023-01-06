@@ -182,236 +182,223 @@ namespace MarkovLibraryCSharp
     //	}
     namespace MarkovFunctors
     {
-        ////////////////////////////////////////
-        //Functor for sorting arcs by neighbor 
-        ////////////////////////////////////////
-        //C++ TO C# CONVERTER WARNING: The original C++ template specifier was replaced with a C# generic specifier, which may not produce the same behavior:
-        //ORIGINAL LINE: template<typename Arc<Vertex>>
-        public class SortArcByNeighbor<Arc<Vertex>> : std::binary_function<Arc<Vertex>*, Arc<Vertex>*, bool>
-		{
-			//C++ TO C# CONVERTER WARNING: 'const' methods are not available in C#:
-			//ORIGINAL LINE: result_type operator ()(first_argument_type& left, second_argument_type& right) const
-			public static result_type functorMethod(first_argument_type left, second_argument_type right)
-		{
-			return (left._neighbor < right._neighbor);
-		}
-	}
-	///////////////////////////////////////////////////////////////
-	///Specialized Inner Product Function Objects
-	//////////////////////////////////////////////////////////////
-	//C++ TO C# CONVERTER WARNING: The original C++ template specifier was replaced with a C# generic specifier, which may not produce the same behavior:
-	//ORIGINAL LINE: template<class _Ty, class _Functor>
-	public class ProbInnerProduct<_Ty, _Functor> : std::unary_function<_Ty, void>
-	{
-		public static result_type functorMethod(argument_type itr)
-		{
-			double temp = 0;
-			itr._tempProbability = std::accumulate(itr._neighborhood.begin(), itr._neighborhood.end(), temp, default(_Functor));
-		}
-	}
-	//C++ TO C# CONVERTER WARNING: The original C++ template specifier was replaced with a C# generic specifier, which may not produce the same behavior:
-	//ORIGINAL LINE: template<class _Ty, class _Functor, typename _argTy>
-	public class PassProbInnerProduct<_Ty, _Functor, _argTy> : std::unary_function<_Ty, void>
-	{
-		private _argTy _arg = new _argTy();
-		public PassProbInnerProduct(_argTy arg)
-		{
-			_arg = arg;
-		}
-		public static result_type functorMethod(argument_type itr)
-		{
-			double temp = 0;
-			itr._tempProbability = std::accumulate(itr._neighborhood.begin(), itr._neighborhood.end(), temp, _Functor(_arg));
-		}
-	}
-	//C++ TO C# CONVERTER WARNING: The original C++ template specifier was replaced with a C# generic specifier, which may not produce the same behavior:
-	//ORIGINAL LINE: template<class _Ty, class _Functor>
-	public class PayInnerProduct<_Ty, _Functor> : std::unary_function<_Ty, void>
-	{
-		public static result_type functorMethod(argument_type itr)
-		{
-			double temp = 0;
-			itr._tempPay = std::accumulate(itr._neighborhood.begin(), itr._neighborhood.end(), temp, default(_Functor));
-		}
-	}
+        static class MarkovFunctors
+        { 
+            ////////////////////////////////////////
+            //Functor for sorting arcs by neighbor 
 
-	////////////////////////////////////////////////
-	//Functors for Inner Products
-	//////////////////////////////////////////////
-	//C++ TO C# CONVERTER WARNING: The original C++ template specifier was replaced with a C# generic specifier, which may not produce the same behavior:
-	//ORIGINAL LINE: template<typename Arc<Vertex>>
-	public class ArcTimesProb<Arc<Vertex>> : std::binary_function<double, Arc<Vertex>*, double> //<first_argument_type,second_argument_type,result_type>
-		{
-			//C++ TO C# CONVERTER WARNING: 'const' methods are not available in C#:
-			//ORIGINAL LINE: result_type operator ()(const first_argument_type& tempProb, const second_argument_type& arc) const
-			public static result_type functorMethod(first_argument_type tempProb, second_argument_type arc)
-	{
-		return tempProb + (arc._probability * arc._neighbor._probability);
-	}
-}
-//Arcs that pay model 
-public class ArcExp : std::binary_function<double, PayArc<VertexAP>*, double>
-{
-	//C++ TO C# CONVERTER WARNING: 'const' methods are not available in C#:
-	//ORIGINAL LINE: result_type operator ()(const first_argument_type& tempPay, const second_argument_type& arc) const
-	public static result_type functorMethod(first_argument_type tempPay, second_argument_type arc)
-	{
-		return tempPay + (arc._probability * ((arc._neighbor._pay) + (arc._neighbor._probability) * (arc._pay))); //calc
-	}
-}
-//Traditional dot product on pay
-//C++ TO C# CONVERTER WARNING: The original C++ template specifier was replaced with a C# generic specifier, which may not produce the same behavior:
-//ORIGINAL LINE: template<typename Arc<Vertex>>
-public class ArcTimesPay<Arc<Vertex>> : std::binary_function<double, Arc<Vertex>*, double>
-		{
-	//C++ TO C# CONVERTER WARNING: 'const' methods are not available in C#:
-	//ORIGINAL LINE: result_type operator ()(const first_argument_type& tempPay, const second_argument_type& arc) const
-	public static result_type functorMethod(first_argument_type tempPay, second_argument_type arc)
-	{
-		return (tempPay + arc._probability * arc._neighbor._pay); //value of moving ahead
-	}
-}
+            public class SortArcByNeighbor<_ArcType> where _ArcType : IArc<_VertexType> where _VertexType : IVertex
+            {
+                //C++ TO C# CONVERTER WARNING: 'const' methods are not available in C#:
+                //ORIGINAL LINE: result_type operator ()(first_argument_type& left, second_argument_type& right) const
+                public static result_type functorMethod(first_argument_type left, second_argument_type right)
+                {
+                    return (left._neighbor < right._neighbor);
+                }
+            }
+            ///////////////////////////////////////////////////////////////
+            ///Specialized Inner Product Function Objects
+            //////////////////////////////////////////////////////////////
+            public delegate double ProbInnerProduct<_Ty, _Functor> (_Ty vertex,ProbInnerProduct<_Ty, _Functor> func1);
+        
+            public static double ProbInnerProductMethod<_Ty, _Functor> (_Ty vertex, ProbInnerProduct<_Ty, _Functor> itr)
+            {
+                    double temp = 0;
+                    return vertex._tempProbability = std::accumulate(itr._neighborhood.begin(), itr._neighborhood.end(), temp, default(_Functor));
+            
+            }
+            //public class ProbInnerProduct<_Ty, _Functor> : std::unary_function<_Ty, void>
+            //{
+            //    public static result_type functorMethod(argument_type itr)
+            //    {
+            //        double temp = 0;
+            //        itr._tempProbability = std::accumulate(itr._neighborhood.begin(), itr._neighborhood.end(), temp, default(_Functor));
+            //    }
+            //}
 
-//traditional dot product excluding any vertex with a given pay
-//C++ TO C# CONVERTER WARNING: The original C++ template specifier was replaced with a C# generic specifier, which may not produce the same behavior:
-//ORIGINAL LINE: template<typename Arc<Vertex>, typename double>
-public class ExcludeTimes<Arc<Vertex>, double > : std::binary_function<double, Arc<Vertex>*, double>
-		{
-			private double _excludePay = new double();
-			public ExcludeTimes(double pay)
-			{
-				_excludePay = pay;
-			}
-			//C++ TO C# CONVERTER WARNING: 'const' methods are not available in C#:
-			//ORIGINAL LINE: result_type operator ()(const first_argument_type& tempProb, const second_argument_type& arc) const
-			public static result_type functorMethod(first_argument_type tempProb, second_argument_type arc)
-			{
-				return ((arc._neighbor._pay != _excludePay) ? (tempProb + (arc._probability * arc._neighbor._probability)) : (tempProb));
-			}
-		}
-		////////////////////////////////////////
-		//Update functions
-		////////////////////////////////////////
-		//C++ TO C# CONVERTER WARNING: The original C++ template specifier was replaced with a C# generic specifier, which may not produce the same behavior:
-		//ORIGINAL LINE: template<class _Ty>
-	public class UpdateProbs<_Ty> : std::unary_function<_Ty, void>
-	{
-		public static result_type functorMethod(argument_type itr)
-		{
-			itr._probability = itr._tempProbability;
-		}
-	}
+            public class PassProbInnerProduct<_Ty, _Functor, _argTy> : std::unary_function<_Ty, void>
+            {
+                private _argTy _arg = new _argTy();
+                public PassProbInnerProduct(_argTy arg)
+                {
+                    _arg = arg;
+                }
+                public static result_type functorMethod(argument_type itr)
+                {
+                    double temp = 0;
+                    itr._tempProbability = std::accumulate(itr._neighborhood.begin(), itr._neighborhood.end(), temp, _Functor(_arg));
+                }
+            }
+            //C++ TO C# CONVERTER WARNING: The original C++ template specifier was replaced with a C# generic specifier, which may not produce the same behavior:
+            //ORIGINAL LINE: template<class _Ty, class _Functor>
+            public class PayInnerProduct<_Ty, _Functor> : std::unary_function<_Ty, void>
+            {
+                public static result_type functorMethod(argument_type itr)
+                {
+                    double temp = 0;
+                    itr._tempPay = std::accumulate(itr._neighborhood.begin(), itr._neighborhood.end(), temp, default(_Functor));
+                }
+            }
 
-//C++ TO C# CONVERTER WARNING: The original C++ template specifier was replaced with a C# generic specifier, which may not produce the same behavior:
-//ORIGINAL LINE: template<class _Ty>
-public class UpdatePays<_Ty> : std::unary_function<_Ty, void>
-{
-	public static result_type functorMethod(argument_type itr)
-	{
-		itr._pay = itr._tempPay;
-	}
-}
-//C++ TO C# CONVERTER WARNING: The original C++ template specifier was replaced with a C# generic specifier, which may not produce the same behavior:
-//ORIGINAL LINE: template<class _Ty>
-public class OptiPayUpdate<_Ty> : std::unary_function<_Ty, void>
-{
-	public static result_type functorMethod(argument_type itr)
-	{
-		if (!(itr._pay > itr._tempPay)) //optimal to move forward, update _pay
-		{
-			itr._pay = itr._tempPay;
-			itr._strategy = true;
-		}
-		else
-		{
-			itr._strategy = false;
-		}
-	}
-}
-///////////////////////////////////////////////////////
-///Delete and reset functions
-/////////////////////////////////////////////////////
-//C++ TO C# CONVERTER WARNING: The original C++ template specifier was replaced with a C# generic specifier, which may not produce the same behavior:
-//ORIGINAL LINE: template<class _Ty, typename Arc<Vertex>>
-public class ClearNeighborhood<_Ty, Arc<Vertex>> : std::unary_function<_Ty, void>
-{
-	public static result_type functorMethod(argument_type itr)
-	{
-		List<Arc<Vertex>>.Enumerator arcItr;
-		List<Arc<Vertex>>.Enumerator end = itr._neighborhood.end();
-		for (arcItr = itr._neighborhood.begin(); arcItr != end; ++arcItr)
-		{
-			//deallocate arc
-			//C++ TO C# CONVERTER TODO TASK: Iterators are only converted within the context of 'while' and 'for' loops:
-			arcItr = null;
-		}
-		//clear neighborhood vector
-		itr._neighborhood.clear();
-	}
-}
+            ////////////////////////////////////////////////
+            //Functors for Inner Products
+            //////////////////////////////////////////////
 
-//C++ TO C# CONVERTER WARNING: The original C++ template specifier was replaced with a C# generic specifier, which may not produce the same behavior:
-//ORIGINAL LINE: template<class _Ty>
-static System.Action<_VertexType> ResetVertex<_Ty> ()
-{
-		itr.reset();	
-}
+            public delegate double ArcTimesProb<IArc<_VertexType>>(double tempProb, IArc<_VectorType> arc);
+            public static double ArcTimesProbMethod<IArc<_VertexType>>(double tempProb, IArc<_VectorType> arc)
+            {
+                    return tempProb + (arc._probability* arc._neighbor._probability);
+            }
+	        //public class ArcTimesProb<Arc<IVertex>> : std::binary_function<double, Arc<Vertex>*, double> // Binary function provides these types <first_argument_type,second_argument_type,result_type>
+	        //{
+	        //		//C++ TO C# CONVERTER WARNING: 'const' methods are not available in C#:
+	        //		//ORIGINAL LINE: result_type operator ()(const first_argument_type& tempProb, const second_argument_type& arc) const
+	        //	public static result_type functorMethod(first_argument_type tempProb, second_argument_type arc)
+	        //    {
+	        //	    return tempProb + (arc._probability * arc._neighbor._probability);
+	        //    }
+         //   }
+            //Arcs that pay model 
+            public class ArcExp : std::binary_function<double, PayArc<VertexAP>*, double>
+            {
+	            public static result_type functorMethod(first_argument_type tempPay, second_argument_type arc)
+	            {
+		            return tempPay + (arc._probability * ((arc._neighbor._pay) + (arc._neighbor._probability) * (arc._pay))); //calc
+	            }
+            }
+        //Traditional dot product on pay
+        public class ArcTimesPay<Arc<Vertex>> : std::binary_function<double, Arc<Vertex>*, double>
+		        {
+	        //C++ TO C# CONVERTER WARNING: 'const' methods are not available in C#:
+	        //ORIGINAL LINE: result_type operator ()(const first_argument_type& tempPay, const second_argument_type& arc) const
+	        public static result_type functorMethod(first_argument_type tempPay, second_argument_type arc)
+	        {
+		        return (tempPay + arc._probability * arc._neighbor._pay); //value of moving ahead
+	        }
+        }
 
-///////////////////////////////////////////////////////////////////
-////Calcualates _pay*_probability of a vertex and adds it to temp
-//////////////////////////////////////////////////////////////////
-//C++ TO C# CONVERTER WARNING: The original C++ template specifier was replaced with a C# generic specifier, which may not produce the same behavior:
-//ORIGINAL LINE: template<class _Ty>
-public class VertexPayback<_Ty> : std::binary_function<double, _Ty, double>
-{
-	//C++ TO C# CONVERTER WARNING: 'const' methods are not available in C#:
-	//ORIGINAL LINE: result_type operator ()(first_argument_type& temp, second_argument_type& itr) const
-	public static result_type functorMethod(first_argument_type temp, second_argument_type itr)
-	{
-		return (temp + (double)(itr._pay) * itr._probability);
-	}
-}
-//////////////////////////////////////////////////////////
-/////For calculating max pay and max pay odds 
-//////////////////////////////////////////////////////////
-//C++ TO C# CONVERTER WARNING: The original C++ template specifier was replaced with a C# generic specifier, which may not produce the same behavior:
-//ORIGINAL LINE: template<class _Ty, typename double>
-public class FindVertexMaxPay<_Ty, double> : std::binary_function<double, _Ty, double>
-{
-	public static result_type functorMethod(first_argument_type curMax, second_argument_type itr)
-	{
-		return ((curMax < (itr.getPay())) ? itr.getPay() : curMax);
-	}
-}
-//C++ TO C# CONVERTER WARNING: The original C++ template specifier was replaced with a C# generic specifier, which may not produce the same behavior:
-//ORIGINAL LINE: template<class _Ty, typename double>
-public class CollectLikeProbs<_Ty, double> : std::binary_function<double, _Ty, double>
-{
-	private double _payToFind = new double();
-	public CollectLikeProbs(double pay)
-	{
-		_payToFind = pay;
-	}
-	public static result_type functorMethod(first_argument_type temp, second_argument_type itr)
-	{
-		return temp + ((itr._probability > 0 && itr.getPay() == _payToFind) ? (itr._probability) : (0));
-	}
-}
+            //traditional dot product excluding any vertex with a given pay
+            public class ExcludeTimes<Arc<Vertex>, double > : std::binary_function<double, Arc<Vertex>*, double>
+		    {
+			    private double _excludePay = new double();
+			    public ExcludeTimes(double pay)
+			    {
+				    _excludePay = pay;
+			    }
+			    //C++ TO C# CONVERTER WARNING: 'const' methods are not available in C#:
+			    //ORIGINAL LINE: result_type operator ()(const first_argument_type& tempProb, const second_argument_type& arc) const
+			    public static result_type functorMethod(first_argument_type tempProb, second_argument_type arc)
+			    {
+				    return ((arc._neighbor._pay != _excludePay) ? (tempProb + (arc._probability * arc._neighbor._probability)) : (tempProb));
+			    }
+		    }
+		    ////////////////////////////////////////
+		    //Update functions
+		    ////////////////////////////////////////
+	    public class UpdateProbs<_Ty> : std::unary_function<_Ty, void>
+	    {
+		    public static result_type functorMethod(argument_type itr)
+		    {
+			    itr._probability = itr._tempProbability;
+		    }
+	    }
 
-//perform P=P+sum_{v in V(D) pv*p^0_v)
-//C++ TO C# CONVERTER WARNING: The original C++ template specifier was replaced with a C# generic specifier, which may not produce the same behavior:
-//ORIGINAL LINE: template<class _Ty, typename _NameType, typename double>
-public class OptiProbSum<_Ty, _NameType, double> : std::binary_function<double, _Ty, double>
-{
-	private SortedDictionary<_NameType, double> _startingProbs = new SortedDictionary<_NameType, double>();
-	public OptiProbSum(SortedDictionary<_NameType, double> startingProbs)
-	{
-		_startingProbs = new SortedDictionary<_NameType, double>(startingProbs);
+        public class UpdatePays<_Ty> : std::unary_function<_Ty, void>
+        {
+	        public static result_type functorMethod(argument_type itr)
+	        {
+		        itr._pay = itr._tempPay;
+	        }
+        }
+        public class OptiPayUpdate<_Ty> : std::unary_function<_Ty, void>
+        {
+	        public static result_type functorMethod(argument_type itr)
+	        {
+		        if (!(itr._pay > itr._tempPay)) //optimal to move forward, update _pay
+		        {
+			        itr._pay = itr._tempPay;
+			        itr._strategy = true;
+		        }
+		        else
+		        {
+			        itr._strategy = false;
+		        }
+	        }
+        }
+        ///////////////////////////////////////////////////////
+        ///Delete and reset functions
+        /////////////////////////////////////////////////////
+        public class ClearNeighborhood<_Ty, Arc<Vertex>> : std::unary_function<_Ty, void>
+        {
+	        public static result_type functorMethod(argument_type itr)
+	        {
+		        List<Arc<Vertex>>.Enumerator arcItr;
+		        List<Arc<Vertex>>.Enumerator end = itr._neighborhood.end();
+		        for (arcItr = itr._neighborhood.begin(); arcItr != end; ++arcItr)
+		        {
+			        //deallocate arc
+			        //C++ TO C# CONVERTER TODO TASK: Iterators are only converted within the context of 'while' and 'for' loops:
+			        arcItr = null;
+		        }
+		        //clear neighborhood vector
+		        itr._neighborhood.clear();
+	        }
+        }   
+
+        static System.Action<_VertexType> ResetVertex<_Ty> ()
+        {
+		        itr.reset();	
+        }
+
+        ///////////////////////////////////////////////////////////////////
+        ////Calcualates _pay*_probability of a vertex and adds it to temp
+        //////////////////////////////////////////////////////////////////
+        public class VertexPayback<_Ty> : std::binary_function<double, _Ty, double>
+        {
+	        //C++ TO C# CONVERTER WARNING: 'const' methods are not available in C#:
+	        //ORIGINAL LINE: result_type operator ()(first_argument_type& temp, second_argument_type& itr) const
+	        public static result_type functorMethod(first_argument_type temp, second_argument_type itr)
+	        {
+		        return (temp + (double)(itr._pay) * itr._probability);
+	        }
+        }
+        //////////////////////////////////////////////////////////
+        /////For calculating max pay and max pay odds 
+        //////////////////////////////////////////////////////////
+        public class FindVertexMaxPay<_Ty, double> : std::binary_function<double, _Ty, double>
+        {
+            public static result_type functorMethod(first_argument_type curMax, second_argument_type itr)
+            {
+                return ((curMax < (itr.getPay())) ? itr.getPay() : curMax);
+            }
+        }
+        public class CollectLikeProbs<_Ty, double> : std::binary_function<double, _Ty, double>
+        {
+	        private double _payToFind = new double();
+	        public CollectLikeProbs(double pay)
+	        {
+		        _payToFind = pay;
+	        }
+	        public static result_type functorMethod(first_argument_type temp, second_argument_type itr)
+	        {
+		        return temp + ((itr._probability > 0 && itr.getPay() == _payToFind) ? (itr._probability) : (0));
+	        }
+        }
+
+    //perform P=P+sum_{v in V(D) pv*p^0_v)
+
+        public class OptiProbSum<_Ty, _NameType, double> : std::binary_function<double, _Ty, double>
+        {
+	        private SortedDictionary<_NameType, double> _startingProbs = new SortedDictionary<_NameType, double>();
+	        public OptiProbSum(SortedDictionary<_NameType, double> startingProbs)
+	        {
+		        _startingProbs = new SortedDictionary<_NameType, double>(startingProbs);
+	        }
+	        public static result_type functorMethod(first_argument_type temp, second_argument_type itr)
+	        {
+		        return (temp + (itr.second._probability * _startingProbs[itr.first]));
+	        }
+        }
 	}
-	public static result_type functorMethod(first_argument_type temp, second_argument_type itr)
-	{
-		return (temp + (itr.second._probability * _startingProbs[itr.first]));
-	}
-}
-	}
+    }
 }

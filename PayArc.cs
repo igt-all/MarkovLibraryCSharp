@@ -27,7 +27,7 @@
 namespace MarkovLibraryCSharp
 {
     //Arc class that also includes a pay variable 
-    public class PayArc <_VertexType>
+    public class PayArc <_VertexType> where _VertexType : IVertex
 	{
 		public double _probability;
 		public _VertexType _neighbor;

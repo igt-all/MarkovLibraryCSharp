@@ -27,7 +27,7 @@
 namespace MarkovLibraryCSharp
 {
     //Arc class for use in constructing transition and optimization graphs 
-    public class Arc <_VertexType>
+    public class Arc <_VertexType> where _VertexType : IVertex
 	{
 		public double _probability;
 		public _VertexType _neighbor;

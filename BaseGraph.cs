@@ -84,7 +84,7 @@ namespace MarkovLibraryCSharp
 			for (vertItr = _vertexMap.GetEnumerator(); vertItr != endVert; ++vertItr)
 			{
 				//C++ TO C# CONVERTER TODO TASK: Iterators are only converted within the context of 'while' and 'for' loops:
-				fout << vertItr.first << firstSepr << vertItr.second._probability << secondSepr;
+				Console.WriteLine($" {vertItr.first} << {firstSepr} << {vertItr.second._probability} << {secondSepr}");
 			}
 		}
 		//print current graph pays
