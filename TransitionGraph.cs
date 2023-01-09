@@ -7,9 +7,10 @@ namespace MarkovLibraryCSharp
 		//one iteration of a Markov Chain
 		private void markovProbabilityIteration()
 		{
-			MarkovFunctors.MarkovFunctors.ProbInnerProduct<_VertexType, delegate> probInnerProductDel = MarkovFunctors.MarkovFunctors.ProbInnerProductMethod < _VertexType, delegate>;
+			
 			MarkovFunctors.MarkovFunctors.ArcTimesProb<IArc<_VertexType>> arcTimesProbDel = MarkovFunctors.MarkovFunctors.ArcTimesProbMethod<IArc<_VertexType>>;
-			var tempProb = 0.0;
+            MarkovFunctors.MarkovFunctors.ProbInnerProduct < _VertexType, delegate> probInnerProductDel = MarkovFunctors.MarkovFunctors.ProbInnerProductMethod < _VertexType, arcTimesProbDel>;
+            var tempProb = 0.0;
 			probInnerProductDel(_vertexSet, arcTimesProbDel<IArc<_VertexType>>(tempProb,_vertexSet));
 			_vertexSet.ForEach(probInnerProduct);
 			foreach(var vertex in _vertexSet)

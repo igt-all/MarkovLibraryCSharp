@@ -196,12 +196,13 @@ namespace MarkovLibraryCSharp
                     return (left._neighbor < right._neighbor);
                 }
             }
+
             ///////////////////////////////////////////////////////////////
             ///Specialized Inner Product Function Objects
             //////////////////////////////////////////////////////////////
-            public delegate double ProbInnerProduct<_Ty, _Functor> (_Ty vertex,ProbInnerProduct<_Ty, _Functor> func1);
+            public delegate double ProbInnerProduct<_Ty, _Functor> (_Ty vertex,ArcTimesPay<_Ty, _Functor> func1);
         
-            public static double ProbInnerProductMethod<_Ty, _Functor> (_Ty vertex, ProbInnerProduct<_Ty, _Functor> itr)
+            public static double ProbInnerProductMethod<_Ty, _Functor> (_Ty vertex, ArcTimesPay<_Ty, _Functor> itr)
             {
                     double temp = 0;
                     return vertex._tempProbability = std::accumulate(itr._neighborhood.begin(), itr._neighborhood.end(), temp, default(_Functor));
